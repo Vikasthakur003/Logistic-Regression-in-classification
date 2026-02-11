@@ -1,0 +1,73 @@
+## this project is solve the real world problem that is take input age,income,credit score as user input and predict the output that user loan approved or denied based on details
+using decisionTreeClassifier this algorithmm is very good for predict loan 
+
+import pandas as pd
+import numpy as np
+from sklearn.tree import DecisionTreeClassifier
+
+df = pd.read_csv("loan_data.csv")
+df.head()
+df.info()
+df.isnull().sum()
+X = df.drop("Loan_Approved",axis = 1)
+y = df["Loan_Approved"]
+
+#Train data
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size = 0.2,random_state = 42)
+
+model = DecisionTreeClassifier(max_depth = 5,random_state = 42)
+model.fit(X_train,y_train)
+
+#prediction on testing data
+y_pred = model.predict(X_test)
+
+from sklearn.metrics import accuracy_score,confusion_matrix,classification_report
+print(f"Accuracy :{accuracy_score(y_test,y_pred)}")
+print(f"Confusion metrix : {confusion_matrix(y_test,y_pred)}")
+print(f"classification Report : {classification_report(y_test,y_pred)}")
+
+#confusion matrix display
+from sklearn.metrics import ConfusionMatrixDisplay
+
+ConfusionMatrixDisplay.from_estimator(model, X_test, y_test)
+plt.title("Decision Tree Confusion Matrix")
+plt.show()
+
+
+import matplotlib.pyplot as plt
+plt.figure(figsize = (8,6))
+plt.scatter(df["Credit_Score"],df["Loan_Approved"],cmap = "viridis")
+plt.xlabel("Credit_Score")
+plt.ylabel("Loan_Approved")
+plt.grid(True)
+plt.show()
+
+
+print(y_test,y_pred)
+
+## Outlier detect
+plt.figure(figsize = (8,6))
+plt.boxplot(df["Income"])
+plt.title("Income ourlier detect")
+plt.ylabel("Income")
+plt.show()
+
+#Taking input by user 
+age = float(input("Enter age :"))
+income = int(input("Enter income :"))
+credit_score = int(input("Enter credit score :"))
+           
+user_input = pd.DataFrame([[age,income,credit_score]],
+                          columns = ["Age","Income","Credit_Score",])
+
+#Predict output 
+prediction = model.predict(user_input)
+
+if prediction[0] ==1:
+    print("Loan Approved")
+else:
+    print("Loan Denied")
+
+
+
